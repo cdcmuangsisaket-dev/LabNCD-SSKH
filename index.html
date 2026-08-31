@@ -870,6 +870,27 @@
             if (res.isConfirmed) {
                 showLoader();
                 try {
+                    // --- ระบบ Double Check ป้องกันการกดจองชนกันในเสี้ยววินาที ---
+                    const snapshot = await db.collection('bookings')
+                        .where('date', '==', selectedDate)
+                        .where('time', '==', time)
+                        .get();
+                    
+                    // ตรวจสอบว่ามีคิวนี้ในระบบหรือยัง (ถ้าเป็นการแก้ไขคิวตัวเอง จะอนุญาตให้ผ่านได้)
+                    const isTaken = snapshot.docs.some(doc => doc.id !== editingId);
+                    
+                    if (isTaken) {
+                        hideLoader();
+                        return Swal.fire({
+                            icon: 'error',
+                            title: 'คิวนี้ไม่ว่างแล้ว!',
+                            text: 'ขออภัยครับ มีผู้ใช้งานอื่นทำการจองเวลานี้ตัดหน้าไปเมื่อสักครู่ กรุณาเลือกเวลาอื่นใหม่',
+                            confirmButtonColor: '#4f46e5',
+                            customClass: { popup: 'rounded-3xl' }
+                        });
+                    }
+                    // ----------------------------------------------------
+
                     const payload = { date: selectedDate, time: time, location: location, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
                     if (editingId) await db.collection('bookings').doc(editingId).update(payload);
                     else { payload.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('bookings').add(payload); }
