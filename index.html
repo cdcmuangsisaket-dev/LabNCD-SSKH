@@ -31,7 +31,7 @@
 
     <style>
         body { 
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%); /* ไล่สีฟ้า-ครามพาสเทล ดูสวยพรีเมียม */
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%); /* พื้นหลังไล่สีฟ้า-ครามพาสเทล สบายตา */
             background-attachment: fixed;
             color: #334155; 
         }
@@ -43,34 +43,34 @@
         /* Animation */
         .layout-transition { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* Calendar Styles - ปรับขอบและเงาให้ชัดเจน ไม่กลืนพื้นหลัง */
+        /* Calendar Styles - ปรับให้กล่องลอยมีมิติ */
         .day-cell { 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            border: 1px solid #e2e8f0; /* ขอบเข้มขึ้น */
+            border: 1px solid #e2e8f0; 
             background-color: #ffffff; 
             position: relative; 
             z-index: 1; 
-            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04); /* เพิ่มเงาให้กล่องลอยขึ้นจากพื้นหลัง */
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
             color: #334155;
         }
         
         /* Hover Effect */
         .day-cell:hover:not(.disabled):not(.full):not(.selected) { 
-            background-color: #f0fdfa; color: #0f766e; border-color: #5eead4; /* สีตอนชี้เมาส์ชัดขึ้น */
+            background-color: #f0fdfa; color: #0f766e; border-color: #5eead4; 
             transform: scale(1.05) translateY(-2px); z-index: 10; 
             box-shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.2); 
         }
         
         /* วันที่เลือก */
         .day-cell.selected { 
-            background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%); /* เข้มขึ้นให้เด่นชัด */
+            background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
             color: white; box-shadow: 0 8px 20px -4px rgba(79, 70, 229, 0.6); 
             font-weight: 600; transform: scale(1.02); border: none; 
         }
         
         /* วันที่ถูกปิด (วันหยุด/วันเก่า) */
         .day-cell.disabled { 
-            color: #94a3b8; background-color: #f1f5f9; /* ให้พื้นหลังเทาขึ้นนิดนึงแยกกับวันปกติ */
+            color: #94a3b8; background-color: #f1f5f9; 
             cursor: not-allowed; opacity: 0.8; border: 1px dashed #cbd5e1; 
         }
         
@@ -97,7 +97,6 @@
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
-    <!-- หน้าต่างเข้าสู่ระบบ (Login) แบบ Glassmorphism -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-md">
         <div class="bg-white/95 p-8 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(79,70,229,0.1)] w-full max-w-md mx-4 border border-white">
             <div class="text-center mb-8">
@@ -115,7 +114,7 @@
                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-slate-50 focus:bg-white text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน (รหัสหน่วยบริการ)</label>
                     <input type="password" id="login-password" placeholder="••••••••" 
                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-slate-50 focus:bg-white text-slate-800">
                 </div>
@@ -198,7 +197,7 @@
             <!-- Layout Grid (กว้างเต็มจอ) -->
             <div id="layout-wrapper" class="w-full layout-transition grid grid-cols-1 gap-6 lg:gap-8 transition-all duration-300">
                 
-                <!-- ฝั่งซ้าย: ปฏิทินและฟอร์ม -->
+                <!-- ฝั่งซ้าย: ปฏิทินอย่างเดียว -->
                 <div id="left-panel" class="layout-transition flex flex-col gap-6 w-full">
                     <div class="bg-white/90 p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 backdrop-blur-sm">
                         <div class="flex justify-between items-center mb-6">
@@ -228,7 +227,7 @@
                 <!-- ฝั่งขวา: ฟอร์มการจอง และ รายการจอง (ซ่อนไว้จนกว่าจะกดวันที่) -->
                 <div id="right-panel" class="hidden layout-transition flex flex-col gap-6 h-full opacity-0 translate-y-4 w-full">
                     
-                    <!-- ฟอร์มการจอง (ย้ายมาไว้ฝั่งขวาด้านบน) -->
+                    <!-- ฟอร์มการจอง (อยู่ด้านบน) -->
                     <div id="booking-form" class="hidden bg-white/90 p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 layout-transition opacity-0 translate-y-4 backdrop-blur-sm shrink-0">
                         <div class="flex items-center gap-2 mb-6">
                             <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -275,7 +274,7 @@
                         </div>
                     </div>
 
-                    <!-- รายการจองทั้งหมด (ปรับความสูงให้ยืดหยุ่นรับกับฟอร์มที่อยู่ด้านบน) -->
+                    <!-- รายการจองทั้งหมด (อยู่ด้านล่าง ยืดหยุ่นความสูง) -->
                     <div class="bg-white/90 p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex flex-col flex-1 min-h-[250px] lg:max-h-[50vh] backdrop-blur-sm">
                         <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 shrink-0">
                             <div class="flex items-center gap-2">
@@ -329,7 +328,6 @@
             </div>
             
             <div class="p-6 overflow-y-auto no-scrollbar flex-1 space-y-6">
-                <!-- ปิดเป็นรายเดือน -->
                 <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
                     <h3 class="font-bold text-slate-700 mb-3">ปิดรับคิวทั้งเดือน</h3>
                     <div class="flex gap-3">
@@ -339,7 +337,6 @@
                     <div id="closed-month-list" class="mt-4 flex flex-wrap gap-2"></div>
                 </div>
 
-                <!-- ปิดเป็นรายวัน -->
                 <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
                     <h3 class="font-bold text-slate-700 mb-3">ปิดรับคิวรายวัน (ระบุวัน)</h3>
                     <div class="flex gap-3">
@@ -418,8 +415,10 @@
             "21986: ศูนย์บริการสาธารณสุข(เทศบาล 4)",
             "23954: ศูนย์บริการสาธารณสุข 5",
             "77475: ศูนย์สุขภาพชุมชนเขตเมือง โรงพยาบาลศรีสะเกษ (สังกัด สธ.)",
-            "10700: โรงพยาบาลศรีสะเกษ" // เพิ่มเพื่อรองรับการจองคิวในนาม รพ. ศรีสะเกษ ได้
+            "10700: โรงพยาบาลศรีสะเกษ"
         ];
+        
+        // วันหยุดนักขัตฤกษ์
         const holidays = ["2026-01-01", "2026-03-03", "2026-04-06", "2026-04-13", "2026-04-14", "2026-04-15", "2026-05-01", "2026-05-04", "2026-05-31", "2026-06-03", "2026-07-28", "2026-07-29", "2026-08-12", "2026-10-13", "2026-10-23", "2026-12-05", "2026-12-10", "2026-12-31"];
 
         let currentDate = new Date();
@@ -482,7 +481,6 @@
                 let userDoc;
                 try { userDoc = await db.collection('users').doc(username).get(); } catch(e) {}
                 
-                // ตรวจสอบสิทธิ์ Admin (สำหรับ admin และ 10700)
                 if (username === 'admin' || username === '10700') {
                     actualPassword = (userDoc && userDoc.exists) ? userDoc.data().password : (username === 'admin' ? "sskhadmin2026" : username);
                     if (passwordInput === actualPassword) {
@@ -491,11 +489,10 @@
                         currentUserLocation = username === '10700' ? "10700: โรงพยาบาลศรีสะเกษ" : "ADMIN";
                         document.getElementById('header-user-text').textContent = username === '10700' ? "รพ.ศรีสะเกษ (Admin)" : "ผู้จัดการระบบ (Admin)";
                         document.getElementById('admin-tools').classList.remove('hidden');
-                        localStorage.setItem('ncd_sskh_uid', username); // บันทึกการเข้าสู่ระบบ
+                        localStorage.setItem('ncd_sskh_uid', username); 
                         finishLogin();
                     } else throw new Error("รหัสผ่านไม่ถูกต้อง");
                 } else {
-                    // สำหรับ User ปกติ
                     const matchedLocation = allLocations.find(loc => loc.startsWith(username));
                     if (matchedLocation && username.length >= 5) {
                         actualPassword = (userDoc && userDoc.exists) ? userDoc.data().password : username;
@@ -503,7 +500,7 @@
                             isAdmin = false; currentUserLocation = matchedLocation; currentUserId = username;
                             document.getElementById('header-user-text').textContent = matchedLocation.split(': ')[1];
                             document.getElementById('admin-tools').classList.add('hidden');
-                            localStorage.setItem('ncd_sskh_uid', username); // บันทึกการเข้าสู่ระบบ
+                            localStorage.setItem('ncd_sskh_uid', username); 
                             finishLogin();
                         } else throw new Error("รหัสผ่านไม่ถูกต้อง");
                     } else throw new Error("ไม่พบรหัสผู้ใช้งานนี้ในระบบ");
@@ -523,7 +520,7 @@
 
         function logout() {
             currentUserLocation = null; isAdmin = false; currentUserId = null;
-            localStorage.removeItem('ncd_sskh_uid'); // ลบความจำการเข้าสู่ระบบเมื่อกดออก
+            localStorage.removeItem('ncd_sskh_uid'); 
             document.getElementById('login-username').value = ''; document.getElementById('login-password').value = '';
             document.getElementById('main-app').classList.add('hidden'); document.getElementById('main-app').classList.remove('flex');
             document.getElementById('login-screen').classList.remove('hidden');
@@ -553,7 +550,6 @@
         // === 4. ดึงข้อมูลแบบ Real-time ===
         function listenToData() {
             showLoader();
-            // ดึงข้อมูลการปิดรับคิวของ Admin
             db.collection('settings').doc('calendar').onSnapshot(doc => {
                 if (doc.exists) {
                     const data = doc.data();
@@ -582,13 +578,12 @@
         // === 5. ควบคุม Layout แยก 2 ฝั่ง ===
         function setSplitLayout(active) {
             const wrapper = document.getElementById('layout-wrapper');
-            const left = document.getElementById('left-panel');
             const right = document.getElementById('right-panel');
             const form = document.getElementById('booking-form');
             const dashboard = document.getElementById('quota-dashboard');
 
             if (active) {
-                wrapper.classList.add('lg:grid-cols-2'); // แยกซ้ายขวาเมื่อจอใหญ่
+                wrapper.classList.add('lg:grid-cols-2'); 
                 if(!isAdmin && dashboard) dashboard.classList.remove('hidden');
                 
                 form.classList.remove('hidden'); right.classList.remove('hidden');
@@ -632,7 +627,6 @@
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayEl = document.createElement('div');
-                // ปรับ min-h ให้สูงขึ้นตามขนาดจอ เพื่อให้ปฏิทินดูเต็มตาในหน้าจอคอมพิวเตอร์
                 dayEl.className = 'day-cell min-h-[70px] md:min-h-[90px] lg:min-h-[110px] p-2 rounded-2xl cursor-pointer text-slate-700 font-medium flex flex-col items-center justify-center shadow-sm gap-1';
                 
                 const loopDate = new Date(year, month, day);
@@ -643,24 +637,22 @@
                 let dayContent = `<span class="text-base">${day}</span>`;
                 let dotsHtml = '';
                 
-                // ตรวจสอบสถานะการปิดรับคิวโดย Admin
                 const yyyy_mm = localDateStr.substring(0, 7);
                 const isSystemClosed = closedDays.includes(localDateStr) || closedMonths.includes(yyyy_mm);
 
-                if (loopDate < today) dayEl.classList.add('disabled');
-                else if (dayOfWeek === 0 || dayOfWeek === 6 || holidays.includes(localDateStr) || isSystemClosed) {
+                if (loopDate < today) {
                     dayEl.classList.add('disabled');
-                    // ถ้าถูกปิดโดยแอดมิน ให้แสดงตัวเลขสีแดงๆ
+                } else if (dayOfWeek === 0 || dayOfWeek === 6 || holidays.includes(localDateStr) || isSystemClosed) {
+                    dayEl.classList.add('disabled');
                     if(isSystemClosed) dayContent = `<span class="text-base text-rose-400 font-bold">${day}</span>`;
+                    else if (holidays.includes(localDateStr)) dayContent = `<span class="text-base text-amber-500 font-bold">${day}</span>`;
                 }
                 else {
                     dayEl.dataset.date = localDateStr;
                     
-                    // มีคิวแล้ว 1 คิว -> จุดสีเขียวเรืองแสง
                     if (dayBookings.length === 1) {
                         dotsHtml = `<div class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)] mt-1"></div>`;
                     }
-                    // คิวเต็ม 2 คิว
                     if (dayBookings.length >= 2 && (!editingId || !dayBookings.find(b => b.id === editingId))) {
                         dayEl.classList.add('full'); 
                     }
@@ -669,14 +661,17 @@
                 if (loopDate.getTime() === today.getTime()) dayEl.classList.add('today');
                 if (selectedDate === localDateStr) {
                     dayEl.classList.add('selected');
-                    // ปรับสีจุดถ้าโดนระบายพื้นหลังน้ำเงิน
                     if(dayBookings.length === 1) {
                         dotsHtml = `<div class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_5px_rgba(255,255,255,0.8)] mt-1"></div>`;
                     }
                 }
 
-                // ป้ายกำกับ "ปิดจอง"
-                let extraTag = isSystemClosed ? `<div class="text-[10px] text-rose-500 font-bold bg-rose-50 px-1.5 py-0.5 rounded-md mt-0.5 border border-rose-100">ปิดจอง</div>` : '';
+                let extraTag = '';
+                if (isSystemClosed) {
+                    extraTag = `<div class="text-[10px] text-rose-500 font-bold bg-rose-50 px-1.5 py-0.5 rounded-md mt-0.5 border border-rose-100">ปิดจอง</div>`;
+                } else if (holidays.includes(localDateStr) && loopDate >= today) {
+                    extraTag = `<div class="text-[10px] text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded-md mt-0.5 border border-amber-200">วันหยุด</div>`;
+                }
 
                 dayEl.innerHTML = dayContent + (dotsHtml ? dotsHtml : (extraTag || '<div class="w-1.5 h-1.5 mt-1"></div>'));
                 calendarDaysEl.appendChild(dayEl);
@@ -733,7 +728,6 @@
 
             dayBookings.forEach(b => {
                 const locName = b.location.split(': ')[1] || b.location;
-                // สิทธิ์ลบเฉพาะของตัวเอง หรือ Admin
                 const isMyBooking = (!isAdmin && b.location === currentUserLocation);
                 
                 let actionHtml = '';
@@ -795,8 +789,11 @@
                 if (typeof q === 'number') q = { yearly: q, monthly: 1 }; 
                 const yC = locYearCount[currentUserLocation] || 0, mC = locMonthCount[currentUserLocation] || 0;
                 
+                // ตรวจสอบว่าเป็น PCU 1-5 หรือไม่ (เพื่อปลดล็อกโควต้าต่อวัน)
+                const isPcu = currentUserLocation.includes('ศูนย์บริการสาธารณสุข') || currentUserLocation.includes('ศูนย์สุขภาพชุมชน');
+                
                 selectEl.disabled = true; confirmBtn.disabled = true;
-                if (bookedToday.includes(currentUserLocation)) selectEl.innerHTML = `<option>-- จองวันนี้ไปแล้ว (1 คิว/วัน) --</option>`;
+                if (!isPcu && bookedToday.includes(currentUserLocation)) selectEl.innerHTML = `<option>-- จองวันนี้ไปแล้ว (1 คิว/วัน) --</option>`;
                 else if (yC >= q.yearly) selectEl.innerHTML = `<option>-- โควต้าปีนี้เต็ม (${q.yearly} ครั้ง) --</option>`;
                 else if (mC >= q.monthly) selectEl.innerHTML = `<option>-- โควต้าเดือนนี้เต็ม (${q.monthly} ครั้ง) --</option>`;
                 else {
@@ -808,7 +805,11 @@
                 allLocations.filter(loc => {
                     let q = allYearlyQuotas[yyyy]?.[loc] || { yearly: 20, monthly: 6 };
                     if (typeof q === 'number') q = { yearly: q, monthly: 1 };
-                    return (locYearCount[loc]||0) < q.yearly && (locMonthCount[loc]||0) < q.monthly && !bookedToday.includes(loc);
+                    
+                    // แอดมินสามารถจองให้ PCU ได้หลายคิวในวันเดียวเช่นกัน
+                    const isPcu = loc.includes('ศูนย์บริการสาธารณสุข') || loc.includes('ศูนย์สุขภาพชุมชน');
+                    
+                    return (locYearCount[loc]||0) < q.yearly && (locMonthCount[loc]||0) < q.monthly && (isPcu || !bookedToday.includes(loc));
                 }).forEach(loc => selectEl.innerHTML += `<option value="${loc}">${loc}</option>`);
                 selectEl.disabled = false; confirmBtn.disabled = false;
 
@@ -828,15 +829,13 @@
         
         document.getElementById('calendar-days').addEventListener('click', (e) => {
             const dayEl = e.target.closest('.day-cell');
-            // ยอมให้กดวันที่เต็มหรืออดีตได้ เพื่อดูรายการจองฝั่งขวา แต่ฟอร์มจะไม่โผล่
             if (dayEl && dayEl.dataset.date) {
                 selectedDate = dayEl.dataset.date;
-                renderCalendar(); // อัปเดต UI ปฏิทิน
+                renderCalendar(); 
                 document.getElementById('selected-date-display').value = new Date(selectedDate).toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                 
                 setSplitLayout(true);
                 
-                // ถ้าเป็นวันในอดีต หรือวันหยุด หรือคิวเต็ม จะซ่อนฟอร์ม ไม่ให้จอง
                 if (dayEl.classList.contains('disabled') || (dayEl.classList.contains('full') && !editingId)) {
                     document.getElementById('booking-form').classList.add('hidden');
                 } else {
@@ -870,13 +869,12 @@
             if (res.isConfirmed) {
                 showLoader();
                 try {
-                    // --- ระบบ Double Check ป้องกันการกดจองชนกันในเสี้ยววินาที ---
+                    // --- ระบบ Double Check ป้องกันคิวซ้อน (Race Condition) ---
                     const snapshot = await db.collection('bookings')
                         .where('date', '==', selectedDate)
                         .where('time', '==', time)
                         .get();
                     
-                    // ตรวจสอบว่ามีคิวนี้ในระบบหรือยัง (ถ้าเป็นการแก้ไขคิวตัวเอง จะอนุญาตให้ผ่านได้)
                     const isTaken = snapshot.docs.some(doc => doc.id !== editingId);
                     
                     if (isTaken) {
@@ -889,7 +887,7 @@
                             customClass: { popup: 'rounded-3xl' }
                         });
                     }
-                    // ----------------------------------------------------
+                    // --------------------------------------------------------
 
                     const payload = { date: selectedDate, time: time, location: location, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
                     if (editingId) await db.collection('bookings').doc(editingId).update(payload);
@@ -904,7 +902,6 @@
         // === 10. ฟังก์ชันแอดมินและการลบ ===
         window.deleteBooking = async function(id) {
             const b = allBookingsList.find(x => x.id === id);
-            // Double Check ป้องกันการแฮคข้ามสิทธิ์
             if (!b || (!isAdmin && b.location !== currentUserLocation)) return;
 
             const res = await Swal.fire({ title: 'ยกเลิกคิวนี้?', text: "ไม่สามารถกู้คืนได้!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบ', customClass: { popup: 'rounded-3xl' }});
