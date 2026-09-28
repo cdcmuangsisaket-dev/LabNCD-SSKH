@@ -31,7 +31,7 @@
 
     <style>
         body { 
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%); /* พื้นหลังไล่สีฟ้า-ครามพาสเทล สบายตา */
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
             background-attachment: fixed;
             color: #334155; 
         }
@@ -43,7 +43,7 @@
         /* Animation */
         .layout-transition { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* Calendar Styles - ปรับให้กล่องลอยมีมิติ */
+        /* Calendar Styles */
         .day-cell { 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             border: 1px solid #e2e8f0; 
@@ -52,6 +52,12 @@
             z-index: 1; 
             box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
             color: #334155;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* ดันเนื้อหาขึ้นบน */
+            padding-top: 0.5rem;
+            overflow: hidden;
         }
         
         /* Hover Effect */
@@ -65,7 +71,7 @@
         .day-cell.selected { 
             background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
             color: white; box-shadow: 0 8px 20px -4px rgba(79, 70, 229, 0.6); 
-            font-weight: 600; transform: scale(1.02); border: none; 
+            border: none; 
         }
         
         /* วันที่ถูกปิด (วันหยุด/วันเก่า) */
@@ -75,15 +81,16 @@
         }
         
         /* คิวเต็ม (ไล่สีชมพูอ่อน) */
-        .day-cell.full { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); color: #e11d48; cursor: pointer; border-color: #fecdd3; }
-        .day-cell.full:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(225, 29, 72, 0.1); }
-        .day-cell.full::after { 
-            content: 'เต็ม'; display: block; font-size: 0.65rem; margin-top: -2px; font-weight: 700; 
-            color: #be123c; background: rgba(255,255,255,0.5); padding: 0 4px; border-radius: 4px;
+        .day-cell.full { 
+            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); 
+            color: #e11d48; cursor: pointer; border-color: #fecdd3; 
+        }
+        .day-cell.full:hover { 
+            transform: scale(1.02); box-shadow: 0 4px 12px rgba(225, 29, 72, 0.1); 
         }
         
         /* วันนี้ */
-        .day-cell.today { border: 2px solid #818cf8; color: #4338ca; background-color: #eef2ff; font-weight: 700; }
+        .day-cell.today { border: 2px solid #818cf8; color: #4338ca; background-color: #eef2ff; }
         
         /* Form Radio */
         .time-radio:checked + div { background-color: #eef2ff; border-color: #4f46e5; color: #4f46e5; box-shadow: 0 0 0 1.5px #4f46e5; font-weight: 600; }
@@ -97,6 +104,7 @@
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
+    <!-- Login Screen -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-md">
         <div class="bg-white/95 p-8 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(79,70,229,0.1)] w-full max-w-md mx-4 border border-white">
             <div class="text-center mb-8">
@@ -125,7 +133,7 @@
         </div>
     </div>
 
-    <!-- คอนเทนเนอร์หลัก (เต็มจอ) -->
+    <!-- Main App -->
     <div id="main-app" class="hidden flex-1 flex flex-col w-full h-screen overflow-hidden">
         
         <!-- Header -->
@@ -137,7 +145,6 @@
                 <h1 class="text-xl font-bold text-slate-800">ระบบจองคิวลงแลป</h1>
             </div>
             
-            <!-- เมนู User -->
             <div class="flex items-center gap-3">
                 <div class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
                     <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -150,6 +157,9 @@
                     <button onclick="openClosedModal()" class="text-rose-500 hover:bg-rose-50 bg-white border border-rose-200 p-2 rounded-lg transition-colors flex items-center gap-1 shadow-sm" title="จัดการวันหยุด/ปิดรับคิว">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     </button>
+                    <button onclick="openReportModal()" class="text-blue-500 hover:bg-blue-50 bg-white border border-blue-200 p-2 rounded-lg transition-colors flex items-center gap-1 shadow-sm" title="รายงานการจอง">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </button>
                     <button onclick="openAdminModal()" class="text-amber-600 hover:bg-amber-50 bg-white border border-amber-200 p-2 rounded-lg transition-colors flex items-center gap-1 shadow-sm" title="ตั้งค่าโควต้า">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
                     </button>
@@ -160,10 +170,10 @@
             </div>
         </header>
 
-        <!-- พื้นที่แสดงข้อมูลหลัก -->
+        <!-- Main Content Area -->
         <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 no-scrollbar w-full">
             
-            <!-- Dashboard โควต้า (ซ่อนไว้สำหรับแอดมิน) -->
+            <!-- Quota Dashboard (Hidden for Admin) -->
             <div id="quota-dashboard" class="hidden w-full mb-6 layout-transition opacity-0 translate-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                     <div class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex items-center justify-between">
@@ -194,12 +204,12 @@
                 </div>
             </div>
 
-            <!-- Layout Grid (กว้างเต็มจอ) -->
+            <!-- Layout Grid -->
             <div id="layout-wrapper" class="w-full layout-transition grid grid-cols-1 gap-6 lg:gap-8 transition-all duration-300">
                 
-                <!-- ฝั่งซ้าย: ปฏิทินอย่างเดียว -->
+                <!-- Left Panel: Calendar -->
                 <div id="left-panel" class="layout-transition flex flex-col gap-6 w-full">
-                    <div class="bg-white/90 p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 backdrop-blur-sm">
+                    <div class="bg-white/90 p-4 md:p-6 lg:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 backdrop-blur-sm">
                         <div class="flex justify-between items-center mb-6">
                             <button id="prev-month" class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-medium text-sm flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> เดือนก่อน
@@ -220,14 +230,14 @@
                             <div class="text-[13px] font-bold text-indigo-600 bg-indigo-50 py-1.5 rounded-lg shadow-sm">ส</div>
                         </div>
                         
-                        <div id="calendar-days" class="grid grid-cols-7 gap-2 md:gap-4 text-center"></div>
+                        <div id="calendar-days" class="grid grid-cols-7 gap-1 md:gap-3 text-center"></div>
                     </div>
                 </div>
 
-                <!-- ฝั่งขวา: ฟอร์มการจอง และ รายการจอง (ซ่อนไว้จนกว่าจะกดวันที่) -->
+                <!-- Right Panel: Booking Form & List -->
                 <div id="right-panel" class="hidden layout-transition flex flex-col gap-6 h-full opacity-0 translate-y-4 w-full">
                     
-                    <!-- ฟอร์มการจอง (อยู่ด้านบน) -->
+                    <!-- Booking Form -->
                     <div id="booking-form" class="hidden bg-white/90 p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 layout-transition opacity-0 translate-y-4 backdrop-blur-sm shrink-0">
                         <div class="flex items-center gap-2 mb-6">
                             <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -262,7 +272,7 @@
 
                             <div>
                                 <label class="block text-sm font-medium text-slate-500 mb-1">หน่วยบริการของคุณ:</label>
-                                <select id="location-select" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-white text-slate-700">
+                                <select id="location-select" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-white text-slate-700 truncate">
                                     <option value="">-- โปรดเลือกเวลาด้านบนก่อน --</option>
                                 </select>
                             </div>
@@ -274,19 +284,19 @@
                         </div>
                     </div>
 
-                    <!-- รายการจองทั้งหมด (อยู่ด้านล่าง ยืดหยุ่นความสูง) -->
+                    <!-- Booking List -->
                     <div class="bg-white/90 p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex flex-col flex-1 min-h-[250px] lg:max-h-[50vh] backdrop-blur-sm">
                         <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 shrink-0">
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                                 </div>
                                 <h2 id="list-title" class="text-xl font-bold text-slate-800">รายการจองทั้งหมด</h2>
                             </div>
                         </div>
                         
                         <div id="booking-list" class="flex-1 overflow-y-auto pr-2 space-y-3 no-scrollbar pb-10">
-                            <!-- รายการจะโผล่ที่นี่ -->
+                            <!-- รายการจองจะแสดงที่นี่ -->
                         </div>
                     </div>
                 </div>
@@ -294,7 +304,9 @@
         </main>
     </div>
 
-    <!-- Modal ตั้งค่าโควต้า (Admin) -->
+    <!-- Modals (Admin Settings, Report, Password, Closed Days) -->
+    
+    <!-- Quota Settings Modal -->
     <div id="admin-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh]">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
@@ -314,7 +326,7 @@
         </div>
     </div>
 
-    <!-- Modal ตั้งค่าปิดระบบ/วันหยุด -->
+    <!-- Closed Days/Holidays Modal -->
     <div id="closed-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
@@ -349,7 +361,7 @@
         </div>
     </div>
 
-    <!-- Modal เปลี่ยนรหัสผ่าน -->
+    <!-- Password Modal -->
     <div id="pwd-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8">
             <div class="flex justify-between items-center mb-6">
@@ -370,7 +382,51 @@
         </div>
     </div>
 
-    <!-- Loader -->
+    <!-- Report Modal (Admin Only) -->
+    <div id="report-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-800">รายงานข้อมูลการจองรายเดือน</h2>
+                </div>
+                <button onclick="closeReportModal()" class="text-slate-400 hover:bg-slate-100 p-1 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            
+            <div class="p-6 shrink-0 bg-slate-50 border-b border-slate-100 flex justify-between items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <label class="font-medium text-slate-700">เลือกเดือน:</label>
+                    <input type="month" id="report-month" onchange="renderReport()" class="px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 text-slate-700">
+                </div>
+                <button onclick="exportToCSV()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-medium transition shadow-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    คัดลอกข้อมูล
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto no-scrollbar flex-1">
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-slate-700 border-b border-slate-200">
+                            <tr>
+                                <th class="px-4 py-3 font-semibold w-1/4">วันที่</th>
+                                <th class="px-4 py-3 font-semibold w-1/4">เวลา</th>
+                                <th class="px-4 py-3 font-semibold w-2/4">หน่วยบริการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body" class="divide-y divide-slate-100">
+                            <!-- Data -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="report-empty" class="hidden text-center text-slate-400 py-10 italic">ไม่มีข้อมูลการจองในเดือนนี้</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Loader -->
     <div id="loader" class="fixed inset-0 z-[9999] hidden items-center justify-center loader-overlay">
         <div class="flex flex-col items-center gap-4">
             <div class="spinner"></div>
@@ -391,35 +447,34 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ฐานข้อมูลสถานที่ อัปเดตใหม่ตามข้อมูลล่าสุด
+        // ฐานข้อมูลสถานที่
         const allLocations = [
-            "03277: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านคูซอด ตำบลคูซอด",
-            "03278: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านแทง ตำบลซำ",
-            "03279: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองคู ตำบลจาน",
+            "03278: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านแทง",
+            "03279: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองคู",
             "03280: โรงพยาบาลส่งเสริมสุขภาพตำบลตะดอบ",
-            "03281: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองครกใต้ ตำบลหนองครก",
-            "03282: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านกุดโง้ง ตำบลโพนข่า",
-            "03283: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านกลาง ตำบลโพนค้อ",
-            "03284: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองแวง ตำบลโพนเขวา",
-            "03285: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านสร้างเรือง ตำบลหญ้าปล้อง",
-            "03286: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านโนนแกด ตำบลทุ่ม",
-            "03287: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองไฮ ตำบลหนองไฮ",
-            "03288: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองแก้ว ตำบลหนองแก้ว",
-            "03289: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านน้ำคำ ตำบลน้ำคำ",
-            "03290: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองโน ตำบลน้ำคำ",
-            "03291: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านโพธิ์ ตำบลโพธิ์",
-            "03292: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านก้านเหลือง ตำบลหมากเขียบ",
-            "03293: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองไผ่ ตำบลหนองไผ่",
+            "03281: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองฮาง",
+            "03282: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านกุดโง้ง",
+            "03283: โรงพยาบาลส่งเสริมสุขภาพตำบลกลาง",
+            "03284: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองแวง",
+            "03285: โรงพยาบาลส่งเสริมสุขภาพตำบลสร้างเรือ",
+            "03286: โรงพยาบาลส่งเสริมสุขภาพตำบลโนนแก้ว",
+            "03287: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองใหญ่",
+            "03288: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองแคน",
+            "03289: โรงพยาบาลส่งเสริมสุขภาพตำบลน้ำคำ",
+            "03290: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านโพธิ์",
+            "03291: โรงพยาบาลส่งเสริมสุขภาพตำบลโพธิ์ศรี",
+            "03292: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านก้านเหลือง",
+            "03293: โรงพยาบาลส่งเสริมสุขภาพตำบลหนองไฮ",
+            "10700: โรงพยาบาลศรีสะเกษ",
             "14422: ศูนย์บริการสาธารณสุข2",
             "15204: ศูนย์บริการสาธารณสุข 3",
             "21986: ศูนย์บริการสาธารณสุข(เทศบาล 4)",
             "23954: ศูนย์บริการสาธารณสุข 5",
-            "77475: ศูนย์สุขภาพชุมชนเขตเมือง โรงพยาบาลศรีสะเกษ (สังกัด สธ.)",
-            "10700: โรงพยาบาลศรีสะเกษ"
+            "77475: ศูนย์สุขภาพชุมชนเขตเมือง โรงพยาบาลศรีสะเกษ"
         ];
         
         // วันหยุดนักขัตฤกษ์
-        const holidays = ["2026-01-01", "2026-03-03", "2026-04-06", "2026-04-13", "2026-04-14", "2026-04-15", "2026-05-01", "2026-05-04", "2026-05-31", "2026-06-03", "2026-07-28", "2026-07-29", "2026-08-12", "2026-10-13", "2026-10-23", "2026-12-05", "2026-12-10", "2026-12-31"];
+        const holidays = ["2026-01-01", "2026-04-06", "2026-04-13", "2026-04-14", "2026-04-15", "2026-05-01", "2026-12-05", "2026-12-31"];
 
         let currentDate = new Date();
         let selectedDate = null;
@@ -441,12 +496,11 @@
         function showLoader() { document.getElementById('loader').classList.replace('hidden', 'flex'); }
         function hideLoader() { document.getElementById('loader').classList.replace('flex', 'hidden'); }
 
-        // === 1. ระบบเช็คการล็อกอินอัตโนมัติ (Auto Login) ===
+        // === 1. ระบบ Login ===
         function checkAutoLogin() {
             const savedUid = localStorage.getItem('ncd_sskh_uid');
             if (savedUid) {
                 document.getElementById('login-username').value = savedUid;
-                // ให้ admin และ 10700 ได้สิทธิ์ Admin
                 if (savedUid === 'admin' || savedUid === '10700') {
                     isAdmin = true; 
                     currentUserId = savedUid;
@@ -466,10 +520,8 @@
             }
         }
         
-        // เรียกระบบเช็คการล็อกอินทันทีที่เปิดเว็บ
         checkAutoLogin();
 
-        // === 2. ระบบเข้าสู่ระบบแบบ Manual ===
         async function handleLogin() {
             const username = document.getElementById('login-username').value.trim();
             const passwordInput = document.getElementById('login-password').value;
@@ -528,7 +580,7 @@
             setSplitLayout(false);
         }
 
-        // === 3. เปลี่ยนรหัสผ่าน ===
+        // === 2. เปลี่ยนรหัสผ่าน ===
         function openChangePasswordModal() {
             document.getElementById('new-pwd').value = ''; document.getElementById('confirm-pwd').value = '';
             document.getElementById('pwd-modal').classList.replace('hidden', 'flex');
@@ -547,7 +599,7 @@
             } catch (err) { hideLoader(); Toast.fire({ icon: 'error', title: err.message }); }
         }
 
-        // === 4. ดึงข้อมูลแบบ Real-time ===
+        // === 3. Real-time Data Listener ===
         function listenToData() {
             showLoader();
             db.collection('settings').doc('calendar').onSnapshot(doc => {
@@ -575,7 +627,6 @@
             }, err => { hideLoader(); Toast.fire({ icon: 'error', title: err.message }); });
         }
 
-        // === 5. ควบคุม Layout แยก 2 ฝั่ง ===
         function setSplitLayout(active) {
             const wrapper = document.getElementById('layout-wrapper');
             const right = document.getElementById('right-panel');
@@ -585,7 +636,6 @@
             if (active) {
                 wrapper.classList.add('lg:grid-cols-2'); 
                 if(!isAdmin && dashboard) dashboard.classList.remove('hidden');
-                
                 form.classList.remove('hidden'); right.classList.remove('hidden');
                 setTimeout(() => { 
                     form.classList.remove('opacity-0', 'translate-y-4'); 
@@ -611,7 +661,20 @@
             }
         }
 
-        // === 6. ปฏิทินและโควต้า ===
+        // ฟังก์ชันช่วยย่อชื่อหน่วยบริการในปฏิทิน
+        function getShortName(locationStr) {
+            if (!locationStr) return "";
+            let name = locationStr.split(': ')[1] || locationStr;
+            name = name.replace("โรงพยาบาลส่งเสริมสุขภาพตำบลบ้าน", "");
+            name = name.replace("โรงพยาบาลส่งเสริมสุขภาพตำบล", "");
+            name = name.replace("ศูนย์บริการสาธารณสุข ", "ศูนย์ฯ ");
+            name = name.replace("ศูนย์บริการสาธารณสุข(เทศบาล 4)", "ศูนย์ฯ 4");
+            name = name.replace("ศูนย์สุขภาพชุมชนเขตเมือง โรงพยาบาลศรีสะเกษ", "ศสช.เมือง");
+            name = name.replace("โรงพยาบาล", "รพ.");
+            return name.trim();
+        }
+
+        // === 4. เรนเดอร์ปฏิทิน ===
         function renderCalendar() {
             const calendarDaysEl = document.getElementById('calendar-days');
             calendarDaysEl.innerHTML = '';
@@ -627,15 +690,16 @@
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayEl = document.createElement('div');
-                dayEl.className = 'day-cell min-h-[70px] md:min-h-[90px] lg:min-h-[110px] p-2 rounded-2xl cursor-pointer text-slate-700 font-medium flex flex-col items-center justify-center shadow-sm gap-1';
+                // ปรับ min-h ให้สูงขึ้นในแต่ละขนาดหน้าจอ (lg:min-h-[160px] xl:min-h-[180px])
+                dayEl.className = 'day-cell min-h-[90px] md:min-h-[130px] lg:min-h-[160px] xl:min-h-[180px] pb-2 px-1 md:px-2 rounded-2xl cursor-pointer text-slate-700 font-medium shadow-sm';
                 
                 const loopDate = new Date(year, month, day);
                 const localDateStr = loopDate.toLocaleDateString('en-CA'); 
                 const dayOfWeek = loopDate.getDay();
                 const dayBookings = allBookingsList.filter(b => b.date === localDateStr);
 
-                let dayContent = `<span class="text-base">${day}</span>`;
-                let dotsHtml = '';
+                let dayContent = `<span class="text-base font-bold">${day}</span>`;
+                let bookingsHtml = '';
                 
                 const yyyy_mm = localDateStr.substring(0, 7);
                 const isSystemClosed = closedDays.includes(localDateStr) || closedMonths.includes(yyyy_mm);
@@ -644,36 +708,47 @@
                     dayEl.classList.add('disabled');
                 } else if (dayOfWeek === 0 || dayOfWeek === 6 || holidays.includes(localDateStr) || isSystemClosed) {
                     dayEl.classList.add('disabled');
-                    if(isSystemClosed) dayContent = `<span class="text-base text-rose-400 font-bold">${day}</span>`;
-                    else if (holidays.includes(localDateStr)) dayContent = `<span class="text-base text-amber-500 font-bold">${day}</span>`;
-                }
-                else {
+                    if (isSystemClosed) {
+                        dayContent += `<div class="text-[9px] md:text-[10px] text-rose-500 font-bold bg-rose-50 px-1 py-0.5 rounded-md mt-1 border border-rose-100">ปิดจอง</div>`;
+                    } else if (holidays.includes(localDateStr) && loopDate >= today) {
+                        dayContent += `<div class="text-[9px] md:text-[10px] text-amber-600 font-bold bg-amber-50 px-1 py-0.5 rounded-md mt-1 border border-amber-200">วันหยุด</div>`;
+                    }
+                } else {
                     dayEl.dataset.date = localDateStr;
                     
-                    if (dayBookings.length === 1) {
-                        dotsHtml = `<div class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)] mt-1"></div>`;
+                    if (dayBookings.length > 0) {
+                        dayBookings.sort((a,b) => a.time.localeCompare(b.time));
+                        // เพิ่มช่องว่างระหว่างคิว (gap) และระยะขอบบน (mt)
+                        bookingsHtml = '<div class="flex flex-col gap-1 md:gap-1.5 mt-1 md:mt-2 w-full px-0.5">';
+                        
+                        let isFull = dayBookings.length >= 2 && (!editingId || !dayBookings.find(bk => bk.id === editingId));
+                        
+                        dayBookings.forEach(b => {
+                            let shortName = getShortName(b.location);
+                            let timePrefix = b.time === '08:00' ? '08' : '09';
+                            
+                            // เปลี่ยนสีพื้นหลังถ้าคิวเต็มแล้ว
+                            let bgClass = isFull ? 'bg-rose-50/90 text-rose-700 border-rose-200' : 'bg-indigo-50/90 text-indigo-700 border-indigo-200';
+                            
+                            if (selectedDate === localDateStr) {
+                                bgClass = 'bg-white/25 text-white border-white/40';
+                            }
+
+                            // ปรับขนาดตัวหนังสือ (text-[13px]) และ Padding ให้ใหญ่ขึ้นเมื่ออยู่บนจอคอม
+                            bookingsHtml += `<div class="text-[9px] md:text-[11px] lg:text-[13px] leading-tight truncate text-left w-full ${bgClass} px-1.5 md:px-2 py-1 md:py-1.5 rounded-md border shadow-sm font-medium tracking-tight" title="${b.time} น. ${getShortName(b.location)}"><span class="font-bold mr-0.5">${timePrefix}.</span>${shortName}</div>`;
+                        });
+                        bookingsHtml += '</div>';
                     }
+
                     if (dayBookings.length >= 2 && (!editingId || !dayBookings.find(b => b.id === editingId))) {
                         dayEl.classList.add('full'); 
                     }
                 }
 
                 if (loopDate.getTime() === today.getTime()) dayEl.classList.add('today');
-                if (selectedDate === localDateStr) {
-                    dayEl.classList.add('selected');
-                    if(dayBookings.length === 1) {
-                        dotsHtml = `<div class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_5px_rgba(255,255,255,0.8)] mt-1"></div>`;
-                    }
-                }
+                if (selectedDate === localDateStr) dayEl.classList.add('selected');
 
-                let extraTag = '';
-                if (isSystemClosed) {
-                    extraTag = `<div class="text-[10px] text-rose-500 font-bold bg-rose-50 px-1.5 py-0.5 rounded-md mt-0.5 border border-rose-100">ปิดจอง</div>`;
-                } else if (holidays.includes(localDateStr) && loopDate >= today) {
-                    extraTag = `<div class="text-[10px] text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded-md mt-0.5 border border-amber-200">วันหยุด</div>`;
-                }
-
-                dayEl.innerHTML = dayContent + (dotsHtml ? dotsHtml : (extraTag || '<div class="w-1.5 h-1.5 mt-1"></div>'));
+                dayEl.innerHTML = dayContent + (bookingsHtml ? bookingsHtml : (dayEl.classList.contains('disabled') ? '' : '<div class="flex-1"></div>'));
                 calendarDaysEl.appendChild(dayEl);
             }
             renderQuotaDashboard();
@@ -710,7 +785,6 @@
             document.getElementById('qd-m-used').className = mCount >= q.monthly ? 'text-rose-500' : 'text-emerald-500';
         }
 
-        // === 7. รายการจองฝั่งขวา ===
         function renderBookingList() {
             const listEl = document.getElementById('booking-list');
             listEl.innerHTML = '';
@@ -754,7 +828,7 @@
             });
         }
 
-        // === 8. อัปเดตตัวเลือกฟอร์ม (เช็คโควต้า และเวลาซ้ำ) ===
+        // === 5. อัปเดตตัวเลือกฟอร์ม (เช็คโควต้า และเวลาซ้ำ และ PCU) ===
         function updateFormOptions() {
             if (!selectedDate) return;
             const selectEl = document.getElementById('location-select');
@@ -793,7 +867,10 @@
                 const isPcu = currentUserLocation.includes('ศูนย์บริการสาธารณสุข') || currentUserLocation.includes('ศูนย์สุขภาพชุมชน');
                 
                 selectEl.disabled = true; confirmBtn.disabled = true;
-                if (!isPcu && bookedToday.includes(currentUserLocation)) selectEl.innerHTML = `<option>-- จองวันนี้ไปแล้ว (1 คิว/วัน) --</option>`;
+                
+                if (!isPcu && bookedToday.includes(currentUserLocation)) {
+                    selectEl.innerHTML = `<option>-- จองวันนี้ไปแล้ว (1 คิว/วัน) --</option>`;
+                }
                 else if (yC >= q.yearly) selectEl.innerHTML = `<option>-- โควต้าปีนี้เต็ม (${q.yearly} ครั้ง) --</option>`;
                 else if (mC >= q.monthly) selectEl.innerHTML = `<option>-- โควต้าเดือนนี้เต็ม (${q.monthly} ครั้ง) --</option>`;
                 else {
@@ -806,7 +883,6 @@
                     let q = allYearlyQuotas[yyyy]?.[loc] || { yearly: 20, monthly: 6 };
                     if (typeof q === 'number') q = { yearly: q, monthly: 1 };
                     
-                    // แอดมินสามารถจองให้ PCU ได้หลายคิวในวันเดียวเช่นกัน
                     const isPcu = loc.includes('ศูนย์บริการสาธารณสุข') || loc.includes('ศูนย์สุขภาพชุมชน');
                     
                     return (locYearCount[loc]||0) < q.yearly && (locMonthCount[loc]||0) < q.monthly && (isPcu || !bookedToday.includes(loc));
@@ -823,7 +899,7 @@
             }
         }
 
-        // === 9. การทำงานปุ่มและ Event Listeners ===
+        // === 6. การทำงานปุ่มและ Event Listeners ===
         document.getElementById('prev-month').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
         document.getElementById('next-month').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
         
@@ -869,7 +945,7 @@
             if (res.isConfirmed) {
                 showLoader();
                 try {
-                    // --- ระบบ Double Check ป้องกันคิวซ้อน (Race Condition) ---
+                    // ป้องกันคิวซ้อน (Race Condition)
                     const snapshot = await db.collection('bookings')
                         .where('date', '==', selectedDate)
                         .where('time', '==', time)
@@ -887,7 +963,6 @@
                             customClass: { popup: 'rounded-3xl' }
                         });
                     }
-                    // --------------------------------------------------------
 
                     const payload = { date: selectedDate, time: time, location: location, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
                     if (editingId) await db.collection('bookings').doc(editingId).update(payload);
@@ -899,7 +974,7 @@
             }
         });
 
-        // === 10. ฟังก์ชันแอดมินและการลบ ===
+        // === 7. ฟังก์ชันแอดมินลบและแก้ไข ===
         window.deleteBooking = async function(id) {
             const b = allBookingsList.find(x => x.id === id);
             if (!b || (!isAdmin && b.location !== currentUserLocation)) return;
@@ -931,7 +1006,7 @@
             }
         }
 
-        // === 11. Modal โควต้า ===
+        // === 8. Modal โควต้า (Admin) ===
         window.openAdminModal = function() {
             document.getElementById('admin-quota-year').value = new Date().getFullYear();
             renderAdminQuotaList(); document.getElementById('admin-modal').classList.replace('hidden', 'flex');
@@ -980,7 +1055,7 @@
             } catch (err) { hideLoader(); Toast.fire({ icon: 'error', title: err.message }); }
         }
 
-        // === 12. จัดการวันหยุด / ปิดรับคิว (Admin) ===
+        // === 9. จัดการวันหยุด / ปิดรับคิว (Admin) ===
         window.openClosedModal = function() {
             renderClosedList();
             document.getElementById('closed-modal').classList.replace('hidden', 'flex');
@@ -1007,7 +1082,6 @@
             const val = document.getElementById('input-closed-month').value;
             if(!val) return;
             if(closedMonths.includes(val)) return Toast.fire({icon: 'warning', title: 'เดือนนี้ถูกปิดไว้แล้ว'});
-            
             showLoader();
             const newList = [...closedMonths, val];
             await db.collection('settings').doc('calendar').set({ closedMonths: newList }, { merge: true });
@@ -1019,7 +1093,6 @@
             const val = document.getElementById('input-closed-day').value;
             if(!val) return;
             if(closedDays.includes(val)) return Toast.fire({icon: 'warning', title: 'วันนี้ถูกปิดไว้แล้ว'});
-            
             showLoader();
             const newList = [...closedDays, val];
             await db.collection('settings').doc('calendar').set({ closedDays: newList }, { merge: true });
@@ -1039,6 +1112,92 @@
                 }
                 hideLoader();
             } catch(e) { hideLoader(); Toast.fire({icon: 'error', title: e.message}); }
+        }
+
+        // === 10. ระบบรายงานการจองรายเดือน (Admin) ===
+        window.openReportModal = function() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            document.getElementById('report-month').value = `${yyyy}-${mm}`;
+            renderReport();
+            document.getElementById('report-modal').classList.replace('hidden', 'flex');
+        }
+        
+        window.closeReportModal = function() { 
+            document.getElementById('report-modal').classList.replace('flex', 'hidden'); 
+        }
+
+        window.renderReport = function() {
+            const monthVal = document.getElementById('report-month').value;
+            const tbody = document.getElementById('report-table-body');
+            const emptyMsg = document.getElementById('report-empty');
+            tbody.innerHTML = '';
+            
+            if (!monthVal) return;
+            
+            const filteredBookings = allBookingsList.filter(b => b.date.startsWith(monthVal));
+            filteredBookings.sort((a, b) => {
+                const dateA = new Date(`${a.date}T${a.time}`);
+                const dateB = new Date(`${b.date}T${b.time}`);
+                return dateA - dateB;
+            });
+
+            if (filteredBookings.length === 0) {
+                tbody.parentElement.classList.add('hidden');
+                emptyMsg.classList.remove('hidden');
+            } else {
+                tbody.parentElement.classList.remove('hidden');
+                emptyMsg.classList.add('hidden');
+                
+                filteredBookings.forEach(b => {
+                    const dateObj = new Date(b.date);
+                    const formattedDate = dateObj.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+                    
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-4 py-3 whitespace-nowrap">${formattedDate}</td>
+                            <td class="px-4 py-3 font-medium text-indigo-600 whitespace-nowrap">${b.time} น.</td>
+                            <td class="px-4 py-3">${b.location}</td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        window.exportToCSV = function() {
+            const monthVal = document.getElementById('report-month').value;
+            if (!monthVal) return;
+            
+            const filteredBookings = allBookingsList.filter(b => b.date.startsWith(monthVal));
+            filteredBookings.sort((a, b) => {
+                const dateA = new Date(`${a.date}T${a.time}`);
+                const dateB = new Date(`${b.date}T${b.time}`);
+                return dateA - dateB;
+            });
+
+            if (filteredBookings.length === 0) {
+                Toast.fire({ icon: 'warning', title: 'ไม่มีข้อมูลให้คัดลอก' }); return;
+            }
+
+            let textData = "วันที่\tเวลา\tหน่วยบริการ\n";
+            filteredBookings.forEach(b => {
+                const dateObj = new Date(b.date);
+                const formattedDate = dateObj.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+                textData += `${formattedDate}\t${b.time}\t${b.location}\n`;
+            });
+
+            const textarea = document.createElement('textarea');
+            textarea.value = textData;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                Toast.fire({ icon: 'success', title: 'คัดลอกข้อมูลแล้ว สามารถนำไปวางใน Excel ได้เลย' });
+            } catch (err) {
+                Toast.fire({ icon: 'error', title: 'คัดลอกไม่สำเร็จ' });
+            }
+            document.body.removeChild(textarea);
         }
     </script>
 </body>
