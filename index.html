@@ -804,7 +804,7 @@
 
             dayBookings.forEach(b => {
                 const locName = b.location.split(': ')[1] || b.location;
-                const isMyBooking = (!isAdmin && b.location === currentUserLocation);
+                const isMyBooking = (!isAdmin && b.location.startsWith(currentUserId));
                 
                 let actionHtml = '';
                 if (isAdmin || isMyBooking) {
@@ -979,7 +979,7 @@
         // === 7. ฟังก์ชันแอดมินลบและแก้ไข ===
         window.deleteBooking = async function(id) {
             const b = allBookingsList.find(x => x.id === id);
-            if (!b || (!isAdmin && b.location !== currentUserLocation)) return;
+            if (!b || (!isAdmin && !b.location.startsWith(currentUserId))) return;
 
             const res = await Swal.fire({ title: 'ยกเลิกคิวนี้?', text: "ไม่สามารถกู้คืนได้!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบ', customClass: { popup: 'rounded-3xl' }});
             if (res.isConfirmed) {
