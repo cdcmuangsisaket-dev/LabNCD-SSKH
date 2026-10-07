@@ -43,7 +43,7 @@
         /* Animation */
         .layout-transition { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* Calendar Styles */
+        /* Calendar Styles - ปรับขอบและเงาให้ชัดเจน ไม่กลืนพื้นหลัง */
         .day-cell { 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             border: 1px solid #e2e8f0; 
@@ -61,9 +61,9 @@
         }
         
         /* Hover Effect */
-        .day-cell:hover:not(.disabled):not(.full):not(.selected) { 
+        .day-cell:hover:not(.disabled):not(.selected) { 
             background-color: #f0fdfa; color: #0f766e; border-color: #5eead4; 
-            transform: scale(1.05) translateY(-2px); z-index: 10; 
+            transform: scale(1.02) translateY(-2px); z-index: 10; 
             box-shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.2); 
         }
         
@@ -83,14 +83,11 @@
         /* คิวเต็ม (ไล่สีชมพูอ่อน) */
         .day-cell.full { 
             background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); 
-            color: #e11d48; cursor: pointer; border-color: #fecdd3; 
-        }
-        .day-cell.full:hover { 
-            transform: scale(1.02); box-shadow: 0 4px 12px rgba(225, 29, 72, 0.1); 
+            color: #e11d48; border-color: #fecdd3; 
         }
         
         /* วันนี้ */
-        .day-cell.today { border: 2px solid #818cf8; color: #4338ca; background-color: #eef2ff; }
+        .day-cell.today { border: 2px solid #818cf8; color: #4338ca; background-color: #eef2ff; font-weight: 700; }
         
         /* Form Radio */
         .time-radio:checked + div { background-color: #eef2ff; border-color: #4f46e5; color: #4f46e5; box-shadow: 0 0 0 1.5px #4f46e5; font-weight: 600; }
@@ -104,7 +101,7 @@
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
-    <!-- Login Screen -->
+    <!-- หน้าต่างเข้าสู่ระบบ (Login) แบบ Glassmorphism -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-md">
         <div class="bg-white/95 p-8 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(79,70,229,0.1)] w-full max-w-md mx-4 border border-white">
             <div class="text-center mb-8">
@@ -122,7 +119,7 @@
                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-slate-50 focus:bg-white text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน (รหัสหน่วยบริการ)</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน(รหัสหน่วยบริการ)</label>
                     <input type="password" id="login-password" placeholder="••••••••" 
                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-slate-50 focus:bg-white text-slate-800">
                 </div>
@@ -133,7 +130,7 @@
         </div>
     </div>
 
-    <!-- Main App -->
+    <!-- คอนเทนเนอร์หลัก -->
     <div id="main-app" class="hidden flex-1 flex flex-col w-full h-screen overflow-hidden">
         
         <!-- Header -->
@@ -145,6 +142,7 @@
                 <h1 class="text-xl font-bold text-slate-800">ระบบจองคิวลงแลป</h1>
             </div>
             
+            <!-- เมนู User -->
             <div class="flex items-center gap-3">
                 <div class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
                     <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -154,11 +152,11 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                 </button>
                 <div id="admin-tools" class="hidden flex gap-2">
-                    <button onclick="openClosedModal()" class="text-rose-500 hover:bg-rose-50 bg-white border border-rose-200 p-2 rounded-lg transition-colors flex items-center gap-1 shadow-sm" title="จัดการวันหยุด/ปิดรับคิว">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    </button>
                     <button onclick="openReportModal()" class="text-blue-500 hover:bg-blue-50 bg-white border border-blue-200 p-2 rounded-lg transition-colors flex items-center gap-1 shadow-sm" title="รายงานการจอง">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </button>
+                    <button onclick="openClosedModal()" class="text-rose-500 hover:bg-rose-50 bg-white border border-rose-200 p-2 rounded-lg transition-colors flex items-center gap-1 shadow-sm" title="จัดการวันหยุด/ปิดรับคิว">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     </button>
                     <button onclick="openAdminModal()" class="text-amber-600 hover:bg-amber-50 bg-white border border-amber-200 p-2 rounded-lg transition-colors flex items-center gap-1 shadow-sm" title="ตั้งค่าโควต้า">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
@@ -170,10 +168,10 @@
             </div>
         </header>
 
-        <!-- Main Content Area -->
+        <!-- พื้นที่แสดงข้อมูลหลัก -->
         <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 no-scrollbar w-full">
             
-            <!-- Quota Dashboard (Hidden for Admin) -->
+            <!-- Dashboard โควต้า (ซ่อนไว้สำหรับแอดมิน) -->
             <div id="quota-dashboard" class="hidden w-full mb-6 layout-transition opacity-0 translate-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                     <div class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex items-center justify-between">
@@ -204,12 +202,12 @@
                 </div>
             </div>
 
-            <!-- Layout Grid -->
+            <!-- Layout Grid (กว้างเต็มจอ, ปฏิทินซ้าย ฟอร์มจองขวา) -->
             <div id="layout-wrapper" class="w-full layout-transition grid grid-cols-1 gap-6 lg:gap-8 transition-all duration-300">
                 
-                <!-- Left Panel: Calendar -->
+                <!-- ฝั่งซ้าย: ปฏิทิน -->
                 <div id="left-panel" class="layout-transition flex flex-col gap-6 w-full">
-                    <div class="bg-white/90 p-4 md:p-6 lg:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 backdrop-blur-sm">
+                    <div class="bg-white/90 p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 backdrop-blur-sm">
                         <div class="flex justify-between items-center mb-6">
                             <button id="prev-month" class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-medium text-sm flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> เดือนก่อน
@@ -230,14 +228,14 @@
                             <div class="text-[13px] font-bold text-indigo-600 bg-indigo-50 py-1.5 rounded-lg shadow-sm">ส</div>
                         </div>
                         
-                        <div id="calendar-days" class="grid grid-cols-7 gap-1 md:gap-3 text-center"></div>
+                        <div id="calendar-days" class="grid grid-cols-7 gap-2 md:gap-4 text-center"></div>
                     </div>
                 </div>
 
-                <!-- Right Panel: Booking Form & List -->
+                <!-- ฝั่งขวา: ฟอร์มจอง & รายการ (ซ่อนไว้จนกว่าจะกดวันที่) -->
                 <div id="right-panel" class="hidden layout-transition flex flex-col gap-6 h-full opacity-0 translate-y-4 w-full">
                     
-                    <!-- Booking Form -->
+                    <!-- ฟอร์มการจอง (อยู่ด้านบน) -->
                     <div id="booking-form" class="hidden bg-white/90 p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 layout-transition opacity-0 translate-y-4 backdrop-blur-sm shrink-0">
                         <div class="flex items-center gap-2 mb-6">
                             <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -284,7 +282,7 @@
                         </div>
                     </div>
 
-                    <!-- Booking List -->
+                    <!-- รายการจอง (อยู่ด้านล่างฟอร์ม) -->
                     <div class="bg-white/90 p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex flex-col flex-1 min-h-[250px] lg:max-h-[50vh] backdrop-blur-sm">
                         <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 shrink-0">
                             <div class="flex items-center gap-2">
@@ -296,17 +294,16 @@
                         </div>
                         
                         <div id="booking-list" class="flex-1 overflow-y-auto pr-2 space-y-3 no-scrollbar pb-10">
-                            <!-- รายการจองจะแสดงที่นี่ -->
+                            <!-- รายการจะโผล่ที่นี่ -->
                         </div>
                     </div>
+
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Modals (Admin Settings, Report, Password, Closed Days) -->
-    
-    <!-- Quota Settings Modal -->
+    <!-- Modal ตั้งค่าโควต้า (Admin) -->
     <div id="admin-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh]">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
@@ -326,7 +323,7 @@
         </div>
     </div>
 
-    <!-- Closed Days/Holidays Modal -->
+    <!-- Modal ตั้งค่าปิดระบบ/วันหยุด -->
     <div id="closed-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
@@ -340,6 +337,7 @@
             </div>
             
             <div class="p-6 overflow-y-auto no-scrollbar flex-1 space-y-6">
+                <!-- ปิดเป็นรายเดือน -->
                 <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
                     <h3 class="font-bold text-slate-700 mb-3">ปิดรับคิวทั้งเดือน</h3>
                     <div class="flex gap-3">
@@ -349,6 +347,7 @@
                     <div id="closed-month-list" class="mt-4 flex flex-wrap gap-2"></div>
                 </div>
 
+                <!-- ปิดเป็นรายวัน -->
                 <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
                     <h3 class="font-bold text-slate-700 mb-3">ปิดรับคิวรายวัน (ระบุวัน)</h3>
                     <div class="flex gap-3">
@@ -361,28 +360,7 @@
         </div>
     </div>
 
-    <!-- Password Modal -->
-    <div id="pwd-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-slate-800">เปลี่ยนรหัสผ่าน</h2>
-                <button onclick="closePwdModal()" class="text-slate-400 hover:bg-slate-100 p-1 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">รหัสผ่านใหม่</label>
-                    <input type="password" id="new-pwd" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">ยืนยันรหัสผ่านใหม่</label>
-                    <input type="password" id="confirm-pwd" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none">
-                </div>
-                <button onclick="saveNewPassword()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl mt-2">บันทึกรหัสผ่าน</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Report Modal (Admin Only) -->
+    <!-- Modal รายงานการจอง (Admin) -->
     <div id="report-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh]">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
@@ -426,7 +404,28 @@
         </div>
     </div>
 
-    <!-- Global Loader -->
+    <!-- Modal เปลี่ยนรหัสผ่าน -->
+    <div id="pwd-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-slate-800">เปลี่ยนรหัสผ่าน</h2>
+                <button onclick="closePwdModal()" class="text-slate-400 hover:bg-slate-100 p-1 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">รหัสผ่านใหม่</label>
+                    <input type="password" id="new-pwd" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">ยืนยันรหัสผ่านใหม่</label>
+                    <input type="password" id="confirm-pwd" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none">
+                </div>
+                <button onclick="saveNewPassword()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl mt-2">บันทึกรหัสผ่าน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loader -->
     <div id="loader" class="fixed inset-0 z-[9999] hidden items-center justify-center loader-overlay">
         <div class="flex flex-col items-center gap-4">
             <div class="spinner"></div>
@@ -447,7 +446,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ฐานข้อมูลสถานที่
+        // === ฐานข้อมูลสถานที่อัปเดตใหม่สุด ===
         const allLocations = [
             "03277: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านคูซอด ตำบลคูซอด",
             "03278: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านแทง ตำบลซำ",
@@ -465,7 +464,7 @@
             "03290: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองโน ตำบลน้ำคำ",
             "03291: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านโพธิ์ ตำบลโพธิ์",
             "03292: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านก้านเหลือง ตำบลหมากเขียบ",
-            "03293: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองไผ ตำบลหนองไผ่",
+            "03293: โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านหนองไผ่ ตำบลหนองไผ่",
             "10700: โรงพยาบาลศรีสะเกษ",
             "14422: ศูนย์บริการสาธารณสุข2",
             "15204: ศูนย์บริการสาธารณสุข 3",
@@ -474,8 +473,7 @@
             "77475: ศูนย์สุขภาพชุมชนเขตเมือง โรงพยาบาลศรีสะเกษ"
         ];
         
-        // วันหยุดนักขัตฤกษ์
-        const holidays = ["2026-01-01", "2026-04-06", "2026-04-13", "2026-04-14", "2026-04-15", "2026-05-01", "2026-12-05", "2026-12-31"];
+        const holidays = ["2026-01-01", "2026-03-03", "2026-04-06", "2026-04-13", "2026-04-14", "2026-04-15", "2026-05-01", "2026-05-04", "2026-05-31", "2026-06-03", "2026-07-28", "2026-07-29", "2026-08-12", "2026-10-13", "2026-10-23", "2026-12-05", "2026-12-10", "2026-12-31"];
 
         let currentDate = new Date();
         let selectedDate = null;
@@ -496,6 +494,21 @@
         
         function showLoader() { document.getElementById('loader').classList.replace('hidden', 'flex'); }
         function hideLoader() { document.getElementById('loader').classList.replace('flex', 'hidden'); }
+
+        // === ฟังก์ชันช่วยย่อชื่อในปฏิทิน ===
+        function getShortName(locationStr) {
+            if (!locationStr) return "";
+            let name = locationStr.split(': ')[1] || locationStr;
+            name = name.split(' ตำบล')[0]; 
+            name = name.replace("โรงพยาบาลส่งเสริมสุขภาพตำบลบ้าน", "");
+            name = name.replace("โรงพยาบาลส่งเสริมสุขภาพตำบล", "");
+            name = name.replace("ศูนย์บริการสาธารณสุข ", "ศูนย์ฯ ");
+            name = name.replace("ศูนย์บริการสาธารณสุข", "ศูนย์ฯ "); 
+            name = name.replace("ศูนย์ฯ (เทศบาล 4)", "ศูนย์ฯ 4");
+            name = name.replace("ศูนย์สุขภาพชุมชนเขตเมือง โรงพยาบาลศรีสะเกษ", "ศสช.เมือง");
+            name = name.replace("โรงพยาบาล", "รพ.");
+            return name.trim();
+        }
 
         // === 1. ระบบ Login ===
         function checkAutoLogin() {
@@ -662,21 +675,7 @@
             }
         }
 
-        // ฟังก์ชันช่วยย่อชื่อหน่วยบริการในปฏิทิน
-        function getShortName(locationStr) {
-            if (!locationStr) return "";
-            let name = locationStr.split(': ')[1] || locationStr;
-            name = name.split(' ตำบล')[0]; // ตัดคำว่า " ตำบล..." ด้านหลังออก เพื่อให้ชื่อในปฏิทินไม่ยาวเกินไป
-            name = name.replace("โรงพยาบาลส่งเสริมสุขภาพตำบลบ้าน", "");
-            name = name.replace("โรงพยาบาลส่งเสริมสุขภาพตำบล", "");
-            name = name.replace("ศูนย์บริการสาธารณสุข ", "ศูนย์ฯ ");
-            name = name.replace("ศูนย์บริการสาธารณสุข(เทศบาล 4)", "ศูนย์ฯ 4");
-            name = name.replace("ศูนย์สุขภาพชุมชนเขตเมือง โรงพยาบาลศรีสะเกษ", "ศสช.เมือง");
-            name = name.replace("โรงพยาบาล", "รพ.");
-            return name.trim();
-        }
-
-        // === 4. เรนเดอร์ปฏิทิน ===
+        // === 4. เรนเดอร์ปฏิทิน (อัปเดตช่องใหญ่แสดงชื่อ) ===
         function renderCalendar() {
             const calendarDaysEl = document.getElementById('calendar-days');
             calendarDaysEl.innerHTML = '';
@@ -692,16 +691,15 @@
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayEl = document.createElement('div');
-                // ปรับ min-h ให้สูงขึ้นในแต่ละขนาดหน้าจอ (lg:min-h-[160px] xl:min-h-[180px])
-                dayEl.className = 'day-cell min-h-[90px] md:min-h-[130px] lg:min-h-[160px] xl:min-h-[180px] pb-2 px-1 md:px-2 rounded-2xl cursor-pointer text-slate-700 font-medium shadow-sm';
+                // ปรับความสูงของกล่องและให้ข้อมูลจัดชิดบน (justify-start)
+                dayEl.className = 'day-cell min-h-[70px] md:min-h-[90px] lg:min-h-[160px] xl:min-h-[180px] p-2 rounded-2xl cursor-pointer text-slate-700 font-medium shadow-sm';
                 
                 const loopDate = new Date(year, month, day);
                 const localDateStr = loopDate.toLocaleDateString('en-CA'); 
                 const dayOfWeek = loopDate.getDay();
                 const dayBookings = allBookingsList.filter(b => b.date === localDateStr);
 
-                let dayContent = `<span class="text-base font-bold">${day}</span>`;
-                let bookingsHtml = '';
+                let dayHtml = `<div>${day}</div>`;
                 
                 const yyyy_mm = localDateStr.substring(0, 7);
                 const isSystemClosed = closedDays.includes(localDateStr) || closedMonths.includes(yyyy_mm);
@@ -711,35 +709,31 @@
                 } else if (dayOfWeek === 0 || dayOfWeek === 6 || holidays.includes(localDateStr) || isSystemClosed) {
                     dayEl.classList.add('disabled');
                     if (isSystemClosed) {
-                        dayContent += `<div class="text-[9px] md:text-[10px] text-rose-500 font-bold bg-rose-50 px-1 py-0.5 rounded-md mt-1 border border-rose-100">ปิดจอง</div>`;
+                        dayHtml = `<div class="text-rose-500 font-bold">${day}</div><div class="text-[9px] md:text-[10px] text-rose-500 font-bold bg-rose-50 px-1.5 py-0.5 rounded-md mt-1 border border-rose-100">ปิดจอง</div>`;
                     } else if (holidays.includes(localDateStr) && loopDate >= today) {
-                        dayContent += `<div class="text-[9px] md:text-[10px] text-amber-600 font-bold bg-amber-50 px-1 py-0.5 rounded-md mt-1 border border-amber-200">วันหยุด</div>`;
+                        dayHtml = `<div class="text-amber-600 font-bold">${day}</div><div class="text-[9px] md:text-[10px] text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded-md mt-1 border border-amber-200">วันหยุด</div>`;
                     }
                 } else {
                     dayEl.dataset.date = localDateStr;
                     
                     if (dayBookings.length > 0) {
                         dayBookings.sort((a,b) => a.time.localeCompare(b.time));
-                        // เพิ่มช่องว่างระหว่างคิว (gap) และระยะขอบบน (mt)
-                        bookingsHtml = '<div class="flex flex-col gap-1 md:gap-1.5 mt-1 md:mt-2 w-full px-0.5">';
+                        // สร้างพื้นที่แสดงชื่อย่อแบบเต็มช่อง
+                        let namesHtml = '<div class="w-full flex flex-col gap-1 md:gap-1.5 mt-1 md:mt-2 px-0.5">';
                         
                         let isFull = dayBookings.length >= 2 && (!editingId || !dayBookings.find(bk => bk.id === editingId));
                         
                         dayBookings.forEach(b => {
                             let shortName = getShortName(b.location);
-                            let timePrefix = b.time === '08:00' ? '08' : '09';
-                            
-                            // เปลี่ยนสีพื้นหลังถ้าคิวเต็มแล้ว
+                            let shortTime = b.time.replace(':00', ''); // แปลง 08:00 เป็น 08
                             let bgClass = isFull ? 'bg-rose-50/90 text-rose-700 border-rose-200' : 'bg-indigo-50/90 text-indigo-700 border-indigo-200';
                             
-                            if (selectedDate === localDateStr) {
-                                bgClass = 'bg-white/25 text-white border-white/40';
-                            }
-
-                            // ปรับขนาดตัวหนังสือ (text-[13px]) และ Padding ให้ใหญ่ขึ้นเมื่ออยู่บนจอคอม
-                            bookingsHtml += `<div class="text-[9px] md:text-[11px] lg:text-[13px] leading-tight truncate text-left w-full ${bgClass} px-1.5 md:px-2 py-1 md:py-1.5 rounded-md border shadow-sm font-medium tracking-tight" title="${b.time} น. ${getShortName(b.location)}"><span class="font-bold mr-0.5">${timePrefix}.</span>${shortName}</div>`;
+                            if (selectedDate === localDateStr) bgClass = 'bg-white/25 text-white border-white/40';
+                            
+                            namesHtml += `<div class="text-[9px] md:text-[11px] lg:text-[13px] leading-tight truncate text-left w-full ${bgClass} px-1.5 md:px-2 py-1 md:py-1.5 rounded-md border shadow-sm tracking-tight" title="${b.time} น. ${shortName}"><span class="font-bold mr-0.5">${shortTime}.</span>${shortName}</div>`;
                         });
-                        bookingsHtml += '</div>';
+                        namesHtml += '</div>';
+                        dayHtml += namesHtml;
                     }
 
                     if (dayBookings.length >= 2 && (!editingId || !dayBookings.find(b => b.id === editingId))) {
@@ -750,7 +744,7 @@
                 if (loopDate.getTime() === today.getTime()) dayEl.classList.add('today');
                 if (selectedDate === localDateStr) dayEl.classList.add('selected');
 
-                dayEl.innerHTML = dayContent + (bookingsHtml ? bookingsHtml : (dayEl.classList.contains('disabled') ? '' : '<div class="flex-1"></div>'));
+                dayEl.innerHTML = dayHtml;
                 calendarDaysEl.appendChild(dayEl);
             }
             renderQuotaDashboard();
@@ -804,7 +798,7 @@
 
             dayBookings.forEach(b => {
                 const locName = b.location.split(': ')[1] || b.location;
-                const isMyBooking = (!isAdmin && b.location.startsWith(currentUserId));
+                const isMyBooking = (!isAdmin && b.location === currentUserLocation);
                 
                 let actionHtml = '';
                 if (isAdmin || isMyBooking) {
@@ -830,18 +824,22 @@
             });
         }
 
-        // === 5. อัปเดตตัวเลือกฟอร์ม (เช็คโควต้า และเวลาซ้ำ และ PCU) ===
+        // === 5. อัปเดตตัวเลือกฟอร์ม (เช็คโควต้า และเวลาซ้ำ และปลดล็อก PCU) ===
         function updateFormOptions() {
             if (!selectedDate) return;
             const selectEl = document.getElementById('location-select');
             const confirmBtn = document.getElementById('confirm-btn');
             const selectedTime = document.querySelector('input[name="time"]:checked')?.value;
             
+            // เช็คว่าใช่ PCU 1-5 หรือไม่
+            const isPcuUser = currentUserLocation && (currentUserLocation.includes('ศูนย์บริการสาธารณสุข') || currentUserLocation.includes('ศูนย์สุขภาพชุมชน'));
+
             const dayBookings = allBookingsList.filter(b => b.date === selectedDate && b.id !== editingId);
             document.querySelectorAll('.time-radio').forEach(radio => {
                 const isTaken = dayBookings.some(b => b.time === radio.value);
-                radio.disabled = isTaken;
-                if (isTaken && radio.checked) radio.checked = false;
+                // ปลดล็อกวิทยุถ้าเป็น Admin หรือ PCU
+                radio.disabled = isTaken && !isAdmin && !isPcuUser;
+                if (radio.disabled && radio.checked) radio.checked = false;
             });
 
             if (!selectedTime) {
@@ -865,12 +863,10 @@
                 if (typeof q === 'number') q = { yearly: q, monthly: 1 }; 
                 const yC = locYearCount[currentUserLocation] || 0, mC = locMonthCount[currentUserLocation] || 0;
                 
-                // ตรวจสอบว่าเป็น PCU 1-5 หรือไม่ (เพื่อปลดล็อกโควต้าต่อวัน)
-                const isPcu = currentUserLocation.includes('ศูนย์บริการสาธารณสุข') || currentUserLocation.includes('ศูนย์สุขภาพชุมชน');
-                
                 selectEl.disabled = true; confirmBtn.disabled = true;
                 
-                if (!isPcu && bookedToday.includes(currentUserLocation)) {
+                // ปลดล็อกเงื่อนไข 1 คิวต่อวัน ให้ PCU
+                if (!isPcuUser && bookedToday.includes(currentUserLocation)) {
                     selectEl.innerHTML = `<option>-- จองวันนี้ไปแล้ว (1 คิว/วัน) --</option>`;
                 }
                 else if (yC >= q.yearly) selectEl.innerHTML = `<option>-- โควต้าปีนี้เต็ม (${q.yearly} ครั้ง) --</option>`;
@@ -914,7 +910,12 @@
                 
                 setSplitLayout(true);
                 
-                if (dayEl.classList.contains('disabled') || (dayEl.classList.contains('full') && !editingId)) {
+                const isPcuUser = currentUserLocation && (currentUserLocation.includes('ศูนย์บริการสาธารณสุข') || currentUserLocation.includes('ศูนย์สุขภาพชุมชน'));
+                const isFull = dayEl.classList.contains('full') && !editingId;
+                const isDisabled = dayEl.classList.contains('disabled');
+
+                // PCU จะไม่โดนซ่อนฟอร์มแม้คิวจะเต็ม
+                if (isDisabled || (isFull && !isAdmin && !isPcuUser)) {
                     document.getElementById('booking-form').classList.add('hidden');
                 } else {
                     document.getElementById('booking-form').classList.remove('hidden');
@@ -947,7 +948,9 @@
             if (res.isConfirmed) {
                 showLoader();
                 try {
-                    // ป้องกันคิวซ้อน (Race Condition)
+                    const isPcuUser = currentUserLocation && (currentUserLocation.includes('ศูนย์บริการสาธารณสุข') || currentUserLocation.includes('ศูนย์สุขภาพชุมชน'));
+                    
+                    // ป้องกันคิวซ้อน (Race Condition) โดย PCU/Admin ผ่านได้เสมอ
                     const snapshot = await db.collection('bookings')
                         .where('date', '==', selectedDate)
                         .where('time', '==', time)
@@ -955,7 +958,7 @@
                     
                     const isTaken = snapshot.docs.some(doc => doc.id !== editingId);
                     
-                    if (isTaken) {
+                    if (isTaken && !isAdmin && !isPcuUser) {
                         hideLoader();
                         return Swal.fire({
                             icon: 'error',
@@ -976,10 +979,11 @@
             }
         });
 
-        // === 7. ฟังก์ชันแอดมินลบและแก้ไข ===
+        // === 7. ฟังก์ชันลบและแก้ไข ===
         window.deleteBooking = async function(id) {
             const b = allBookingsList.find(x => x.id === id);
-            if (!b || (!isAdmin && !b.location.startsWith(currentUserId))) return;
+            // เช็คสิทธิ์การลบ โดยตรวจแค่รหัส 5 หลักด้านหน้า เพื่อให้ลบได้แม้เปลี่ยนชื่อ
+            if (!b || (!isAdmin && b.location.substring(0,5) !== currentUserId)) return;
 
             const res = await Swal.fire({ title: 'ยกเลิกคิวนี้?', text: "ไม่สามารถกู้คืนได้!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบ', customClass: { popup: 'rounded-3xl' }});
             if (res.isConfirmed) {
