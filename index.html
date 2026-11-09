@@ -669,32 +669,37 @@
                     } else if (holidays.includes(localDateStr) && loopDate >= today) {
                         dayHtml = `<div class="text-amber-600 font-bold">${day}</div><div class="text-[9px] md:text-[10px] text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded-md mt-1 border border-amber-200">วันหยุด</div>`;
                     }
-                } else {
-                    dayEl.dataset.date = localDateStr;
-                    
-                    if (dayBookings.length > 0) {
-                        dayBookings.sort((a,b) => a.time.localeCompare(b.time));
-                        let namesHtml = '<div class="w-full flex flex-col gap-1 md:gap-1.5 mt-1 md:mt-2 px-0.5">';
-                        
-                        // กรองเฉพาะการจองปกติ (ไม่รวม PCU) เพื่อใช้นับว่าคิวเต็มหรือยัง
-                        const normalBookings = dayBookings.filter(b => !(b.location.includes('ศูนย์บริการสาธารณสุข') || b.location.includes('ศูนย์สุขภาพชุมชน')));
-                        let isFull = normalBookings.length >= 2 && (!editingId || !normalBookings.find(bk => bk.id === editingId));
-                        
-                        dayBookings.forEach(b => {
-                            let shortName = getShortName(b.location);
-                            let shortTime = b.time.replace(':00', ''); // แปลง 08:00 เป็น 08
-                            let bgClass = isFull ? 'bg-rose-50/90 text-rose-700 border-rose-200' : 'bg-indigo-50/90 text-indigo-700 border-indigo-200';
-                            
-                            if (selectedDate === localDateStr) bgClass = 'bg-white/25 text-white border-white/40';
-                            
-                            // นำชื่อไปต่อท้ายตัวเลขวัน โดยใช้ตัวหนังสือใหญ่ขึ้นนิดหน่อยเมื่ออยู่บนจอคอม
-                            namesHtml += `<div class="text-[9px] md:text-[11px] lg:text-[13px] leading-tight truncate text-left w-full ${bgClass} px-1.5 md:px-2 py-1 md:py-1.5 rounded-md border shadow-sm tracking-tight" title="${b.time} น. ${shortName}"><span class="font-bold mr-0.5">${shortTime}.</span>${shortName}</div>`;
-                        });
-                        namesHtml += '</div>';
-                        dayHtml += namesHtml;
-                    }
+                }
 
-                    // ใส่ Class คิวเต็ม เฉพาะตอนที่มีการจองจาก รพ.สต. ปกติครบ 2 คิวเท่านั้น
+                // อนุญาตให้คลิกได้ถ้าเป็นวันปกติ หรือถ้าเป็นแอดมิน (จองได้ทุกวัน) หรือวันที่เคยมีคิวอยู่แล้ว
+                if (!dayEl.classList.contains('disabled') || isAdmin || dayBookings.length > 0) {
+                    dayEl.dataset.date = localDateStr;
+                }
+                
+                if (dayBookings.length > 0) {
+                    dayBookings.sort((a,b) => a.time.localeCompare(b.time));
+                    let namesHtml = '<div class="w-full flex flex-col gap-1 md:gap-1.5 mt-1 md:mt-2 px-0.5">';
+                    
+                    // กรองเฉพาะการจองปกติ (ไม่รวม PCU) เพื่อใช้นับว่าคิวเต็มหรือยัง
+                    const normalBookings = dayBookings.filter(b => !(b.location.includes('ศูนย์บริการสาธารณสุข') || b.location.includes('ศูนย์สุขภาพชุมชน')));
+                    let isFull = normalBookings.length >= 2 && (!editingId || !normalBookings.find(bk => bk.id === editingId));
+                    
+                    dayBookings.forEach(b => {
+                        let shortName = getShortName(b.location);
+                        let shortTime = b.time.replace(':00', ''); // แปลง 08:00 เป็น 08
+                        let bgClass = isFull ? 'bg-rose-50/90 text-rose-700 border-rose-200' : 'bg-indigo-50/90 text-indigo-700 border-indigo-200';
+                        
+                        if (selectedDate === localDateStr) bgClass = 'bg-white/25 text-white border-white/40';
+                        
+                        // นำชื่อไปต่อท้ายตัวเลขวัน โดยใช้ตัวหนังสือใหญ่ขึ้นนิดหน่อยเมื่ออยู่บนจอคอม
+                        namesHtml += `<div class="text-[9px] md:text-[11px] lg:text-[13px] leading-tight truncate text-left w-full ${bgClass} px-1.5 md:px-2 py-1 md:py-1.5 rounded-md border shadow-sm tracking-tight" title="${b.time} น. ${shortName}"><span class="font-bold mr-0.5">${shortTime}.</span>${shortName}</div>`;
+                    });
+                    namesHtml += '</div>';
+                    dayHtml += namesHtml;
+                }
+
+                // ใส่ Class คิวเต็ม เฉพาะตอนที่มีการจองจาก รพ.สต. ปกติครบ 2 คิวเท่านั้น
+                if (!dayEl.classList.contains('disabled')) {
                     const checkNormalBookings = dayBookings.filter(b => !(b.location.includes('ศูนย์บริการสาธารณสุข') || b.location.includes('ศูนย์สุขภาพชุมชน')));
                     if (checkNormalBookings.length >= 2 && (!editingId || !checkNormalBookings.find(b => b.id === editingId))) {
                         dayEl.classList.add('full'); 
@@ -837,16 +842,13 @@
                     selectEl.value = currentUserLocation; confirmBtn.disabled = false;
                 }
             } else {
+                // แอดมินสามารถเลือกได้ทุกหน่วยบริการโดยไม่จำกัดโควต้ารายวัน/เดือน/ปี
                 selectEl.innerHTML = '<option value="">-- คลิกเพื่อเลือกสถานที่ --</option>';
-                allLocations.filter(loc => {
-                    let q = allYearlyQuotas[yyyy]?.[loc] || { yearly: 20, monthly: 6 };
-                    if (typeof q === 'number') q = { yearly: q, monthly: 1 };
-                    
-                    const isPcu = loc.includes('ศูนย์บริการสาธารณสุข') || loc.includes('ศูนย์สุขภาพชุมชน');
-                    
-                    return (locYearCount[loc]||0) < q.yearly && (locMonthCount[loc]||0) < q.monthly && (isPcu || !bookedToday.includes(loc));
-                }).forEach(loc => selectEl.innerHTML += `<option value="${loc}">${loc}</option>`);
-                selectEl.disabled = false; confirmBtn.disabled = false;
+                allLocations.forEach(loc => {
+                    selectEl.innerHTML += `<option value="${loc}">${loc}</option>`;
+                });
+                selectEl.disabled = false; 
+                confirmBtn.disabled = false;
 
                 if (editingId) {
                     const eLoc = allBookingsList.find(b => b.id === editingId)?.location;
@@ -874,8 +876,8 @@
                 const isFull = dayEl.classList.contains('full') && !editingId;
                 const isDisabled = dayEl.classList.contains('disabled');
 
-                // PCU จะไม่โดนซ่อนฟอร์มแม้คิวจะเต็ม
-                if (isDisabled || (isFull && !isAdmin && !isPcuUser)) {
+                // แอดมินไม่ถูกซ่อนฟอร์มไม่ว่าจะคลิกวันหยุด วันปิดจอง หรือวันที่คิวเต็ม
+                if ((isDisabled && !isAdmin) || (isFull && !isAdmin && !isPcuUser)) {
                     document.getElementById('booking-form').classList.add('hidden');
                 } else {
                     document.getElementById('booking-form').classList.remove('hidden');
